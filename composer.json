@@ -1,0 +1,9 @@
+{
+  "name": "freddy2430/gestion_conges",
+  "description": "Application de gestion de congés",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "ext-pdo_mysql": "*"
+  }
+}

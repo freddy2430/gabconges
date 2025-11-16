@@ -1,7 +1,7 @@
 <?php
 
 // FORCER L'AFFICHAGE DES ERREURS POUR LE DÉBOGAGE
-define('ENVIRONMENT', 'production');
+define('ENVIRONMENT', getenv('APP_ENV') ?: 'production');
 
 // Configuration sécurisée de la session (DOIT ÊTRE AVANT session_start())
 session_set_cookie_params([

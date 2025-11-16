@@ -1,0 +1,96 @@
+# Configuration Apache pour l'application de congésGAB
+# À placer dans le dossier public/
+
+# Activer la réécriture d'URL
+RewriteEngine On
+
+# Sécurité : empêcher l'accès aux fichiers sensibles
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Sécurité : masquer les fichiers .php dans l'URL si possible
+# (optionnel, dépend de la configuration souhaitée)
+
+# Configuration des en-têtes de sécurité
+<IfModule mod_headers.c>
+    # Protection contre le clickjacking
+    Header always append X-Frame-Options SAMEORIGIN
+
+    # Protection contre le vol de contenu
+    Header always append X-Content-Type-Options nosniff
+
+    # Politique de sécurité du contenu (à adapter selon les besoins)
+    Header always append Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self'"
+
+    # Référer policy
+    Header always append Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Configuration du cache pour les fichiers statiques
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # CSS et JavaScript (cache 1 mois)
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+
+    # Images (cache 6 mois)
+    ExpiresByType image/png "access plus 6 months"
+    ExpiresByType image/jpg "access plus 6 months"
+    ExpiresByType image/jpeg "access plus 6 months"
+    ExpiresByType image/gif "access plus 6 months"
+    ExpiresByType image/svg+xml "access plus 6 months"
+
+    # Polices (cache 1 an)
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+</IfModule>
+
+# Compression GZIP si disponible
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE text/json
+</IfModule>
+
+# Redirection vers index.php pour les routes non-fichier
+# (optionnel - dépend si vous voulez des URLs propres)
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.*)$ index.php?action=$1 [QSA,L]
+
+# Configuration PHP recommandée (si .htaccess peut modifier la config PHP)
+<IfModule mod_php.c>
+    # Masquer les erreurs en production
+    php_flag display_errors Off
+    php_flag display_startup_errors Off
+
+    # Sécurité : taille maximale des fichiers uploadés
+    php_value upload_max_filesize 2M
+    php_value post_max_size 2M
+
+    # Sécurité : durée d'exécution maximale
+    php_value max_execution_time 30
+
+    # Sécurité : mémoire maximale
+    php_value memory_limit 128M
+
+    # Sessions sécurisées
+    php_value session.cookie_httponly On
+    php_value session.cookie_secure On
+    php_value session.use_strict_mode On
+</IfModule>
